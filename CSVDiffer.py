@@ -38,7 +38,7 @@ class CSVDiffer:
         return len(self.added_rows), len(self.updated_rows), self.header_diffs
 
     @staticmethod
-    def _verify_duplicate_headers(headers, *, file_label="CSV"):
+    def _verify_duplicate_headers(headers, file_label="CSV"):
         """
         Raise ValueError if duplicate headers exist (case-insensitive).
         Treats headers as duplicates if they match after stripping whitespace
