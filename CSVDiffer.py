@@ -65,6 +65,18 @@ class CSVDiffer:
                     f"The file {self.new_path} is empty or missing headers."
                 )
 
+            # Check if first header in both files is the same
+            if not self.headers or not new_headers:
+                raise ValueError("One or both CSV files are missing header data.")
+            current_first_row = (self.headers[0] or "").strip()
+            new_first_row = (new_headers[0] or "").strip()
+
+            if current_first_row != new_first_row:
+                raise ValueError(
+                    f"Header mismatch: first header differs "
+                    f"(current: {current_first_row!r}, new: {new_first_row!r})."
+                )
+
             # Validate column discrepancies
             self._check_header_differences(self.headers, new_headers)
 
@@ -72,7 +84,6 @@ class CSVDiffer:
                 if not row:
                     continue
 
-                # FIXED: The unique key is the string in the first column
                 key = row[0]
 
                 if key not in current_data:
