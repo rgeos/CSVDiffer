@@ -33,7 +33,7 @@ from CSVDiffer import CSVDiffer
     help="Output path for changed rows.",
 )
 def main(current, new, added, updated):
-    """CLI tool tracking cell differences and structural column anomalies between CSV files."""
+    """App tracking cell deltas and structural column differences between CSV files."""
     click.echo("Initializing diff engine...")
 
     try:
