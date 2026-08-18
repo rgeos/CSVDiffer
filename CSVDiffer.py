@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import csv
 import os
 
@@ -6,15 +7,22 @@ class CSVDiffer:
     """A class to compare two CSV files, track header mismatches, and extract row diffs."""
 
     def __init__(
-        self, current_path, new_path, added_path="added.csv", updated_path="updated.csv"
+        self,
+        current_path,
+        new_path,
+        added_path="added.csv",
+        updated_path="updated.csv",
+        merged_path="merged.csv",
     ):
         self.current_path = current_path
         self.new_path = new_path
         self.added_path = added_path
         self.updated_path = updated_path
+        self.merged_path = merged_path
         self.headers = []
         self.added_rows = []
         self.updated_rows = []
+        self.merged_rows = []
         self.header_diffs = {
             "missing_in_new": [],
             "missing_in_current": [],
@@ -104,14 +112,19 @@ class CSVDiffer:
             # Validate column discrepancies
             self._check_header_differences(self.headers, new_headers)
 
+            # Track which original keys from current.csv have been processed
+            processed_keys = set()
+
             for row in reader:
                 if not row:
                     continue
 
                 key = row[0]
+                processed_keys.add(key)
 
                 if key not in current_data:
                     self.added_rows.append(row)
+                    self.merged_rows.append(row)  # New rows go to the merged file
                 else:
                     current_row = current_data[key]
                     has_diff = False
@@ -131,6 +144,18 @@ class CSVDiffer:
 
                     if has_diff:
                         self.updated_rows.append(updated_row)
+                        self.merged_rows.append(
+                            row
+                        )  # Modified rows get the NEW data values
+                    else:
+                        self.merged_rows.append(
+                            current_row
+                        )  # Unchanged rows kept as-is
+
+            # Add any rows from current.csv that weren't present in new.csv at all
+            for key, original_row in current_data.items():
+                if key not in processed_keys:
+                    self.merged_rows.append(original_row)
 
     def _check_header_differences(self, current_hdrs, new_hdrs):
         """Analyzes column name drops, structural additions, and positioning mismatches."""
@@ -149,7 +174,8 @@ class CSVDiffer:
             and not self.header_diffs["missing_in_current"]
         ):
             if current_hdrs != new_hdrs:
-                self.header_diffs["order_mismatch"] = True
+                # self.header_diffs["order_mismatch"] = True
+                raise ValueError("There is a mismatch in header order ...")
 
     def _write_results(self):
         """Persists structural rows output cleanly."""
@@ -162,3 +188,9 @@ class CSVDiffer:
             writer = csv.writer(f)
             writer.writerow(self.headers)
             writer.writerows(self.updated_rows)
+
+        # Write the third merged file using the target schema headers
+        with open(self.merged_path, mode="w", encoding="utf-8", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(self.headers)
+            writer.writerows(self.merged_rows)

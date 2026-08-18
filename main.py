@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import click
 import sys
 from CSVDiffer import CSVDiffer
@@ -32,13 +34,24 @@ from CSVDiffer import CSVDiffer
     show_default=True,
     help="Output path for changed rows.",
 )
-def main(current, new, added, updated):
+@click.option(
+    "-m",
+    "--merged",
+    default="merged.csv",
+    show_default=True,
+    help="Output path for merged rows.",
+)
+def main(current, new, added, updated, merged):
     """App tracking cell deltas and structural column differences between CSV files."""
     click.echo("Initializing diff engine...")
 
     try:
         differ = CSVDiffer(
-            current_path=current, new_path=new, added_path=added, updated_path=updated
+            current_path=current,
+            new_path=new,
+            added_path=added,
+            updated_path=updated,
+            merged_path=merged,
         )
 
         added_count, updated_count, header_diffs = differ.run_diff()
@@ -46,6 +59,7 @@ def main(current, new, added, updated):
         click.secho("\n✨ Execution Successful!", fg="green", bold=True)
         click.echo(f" 📂 Added rows:   {added_count} -> Saved to {added}")
         click.echo(f" 📂 Updated rows: {updated_count} -> Saved to {updated}")
+        click.echo(f" 📂 Fully merged rows were saved to: {merged}")
 
         has_header_issues = (
             header_diffs["missing_in_new"]
