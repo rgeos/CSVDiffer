@@ -37,6 +37,28 @@ class CSVDiffer:
 
         return len(self.added_rows), len(self.updated_rows), self.header_diffs
 
+    @staticmethod
+    def _verify_duplicate_headers(headers, *, file_label="CSV"):
+        """
+        Raise ValueError if duplicate headers exist (case-insensitive).
+        Treats headers as duplicates if they match after stripping whitespace
+        and lowercasing.
+        """
+        if not headers:
+            return
+
+        normalized = [(h.strip().lower() if h is not None else "") for h in headers]
+
+        # Count duplicates
+        duplicates = sorted(
+            {h for h in normalized if normalized.count(h) > 1 if h != ""}
+        )
+
+        if duplicates:
+            raise ValueError(
+                f"Duplicate headers found in {file_label} file: {duplicates}"
+            )
+
     def _load_current_data(self):
         """Reads current.csv headers and records row configurations."""
         current_data = {}
@@ -44,6 +66,7 @@ class CSVDiffer:
             reader = csv.reader(f)
             try:
                 self.headers = next(reader)
+                self._verify_duplicate_headers(self.headers, file_label="current")
             except StopIteration:
                 raise ValueError(
                     f"The file {self.current_path} is empty or missing headers."
@@ -60,6 +83,7 @@ class CSVDiffer:
             reader = csv.reader(f)
             try:
                 new_headers = next(reader)
+                self._verify_duplicate_headers(new_headers, file_label="new")
             except StopIteration:
                 raise ValueError(
                     f"The file {self.new_path} is empty or missing headers."
