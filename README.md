@@ -5,8 +5,8 @@ A command-line utility to compare two CSV files and report differences.
 ## Features
 
 - Compares rows between an “current/new” CSV and outputs the diff in two files
-  - `updated.csv` lists all the rows that exist in both files but have been updated in the `new.csv`
-  - `added.csv` list all the rows that exist in `new.csv` but not in `current.csv`
+  - `data/updated.csv` lists all the rows that exist in both files but have been updated in the `new.csv`
+  - `data/added.csv` list all the rows that exist in `new.csv` but not in `current.csv`
 - Validates CSV header compatibility before performing the diff
   - Stops if the first header name in both files does not match
   - Stops if either CSV contains duplicate header names (case-insensitive)

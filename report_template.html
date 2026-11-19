@@ -1,0 +1,50 @@
+<div class="container" style="margin-top: 2rem; margin-bottom: 3rem;">
+  <div class="row header">
+    <h1 class="page-header">Regression Residual Analysis</h1>
+  </div>
+  <div class="section-items" style="background: #fff; padding: 20px; border-radius: 4px; border: 1px solid #ddd;">
+    <p>
+      <strong>Target Variable:</strong> {target}{transform_tag} &nbsp;|&nbsp;
+      <strong>Total Complete Rows:</strong> {total_rows} &nbsp;|&nbsp;
+      <strong>Flagged Outliers:</strong> {n_outliers} ({pct_outliers:.2f}%)
+    </p>
+    <p><strong>Outlier Rule:</strong> {rule_desc}</p>
+    <p><strong>Numeric Predictors ({n_predictors}):</strong> {predictors_list}</p>
+
+    <table class="table table-bordered table-condensed" style="max-width: 680px; margin-top: 15px; margin-bottom: 20px;">
+      <thead>
+        <tr style="background-color: #f5f5f5;">
+          <th>Metric</th>
+          <th>1. All Data</th>
+          <th>2. Outliers Removed</th>
+          <th>Change (&Delta;)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Rows Used</strong></td>
+          <td>{full_n}</td>
+          <td>{clean_n}</td>
+          <td>{delta_n:+d}</td>
+        </tr>
+        <tr>
+          <td><strong>R²</strong></td>
+          <td>{full_r2:.2%}</td>
+          <td>{clean_r2:.2%}</td>
+          <td>{r2_delta:+.2f}%</td>
+        </tr>
+        <tr>
+          <td><strong>Model RMSE ({scale_label})</strong></td>
+          <td>{full_rmse:.4f}</td>
+          <td>{clean_rmse:.4f}</td>
+          <td>{rmse_delta:+.4f}</td>
+        </tr>
+        {orig_rmse_row}
+      </tbody>
+    </table>
+
+    <div style="text-align: center; margin-top: 15px;">
+      <img src="data:image/png;base64,{img_b64}" alt="Residual Comparison Plot" style="max-width: 100%; height: auto;" />
+    </div>
+  </div>
+</div>
